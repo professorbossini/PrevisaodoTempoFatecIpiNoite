@@ -39,4 +39,6 @@ public class Weather {
                 tz.getOffset(calendar.getTimeInMillis()));
         return new SimpleDateFormat("EEEE").format(calendar.getTime());
     }
+
+
 }

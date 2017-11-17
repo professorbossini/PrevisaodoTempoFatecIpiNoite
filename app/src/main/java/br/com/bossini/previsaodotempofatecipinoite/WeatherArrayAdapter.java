@@ -3,6 +3,7 @@ package br.com.bossini.previsaodotempofatecipinoite;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -44,9 +46,9 @@ public class WeatherArrayAdapter extends ArrayAdapter <Weather>{
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        Weather day = getItem (position);
+        final Weather day = getItem (position);
         Context context = getContext();
-        ViewHolder viewHolder;
+        final ViewHolder viewHolder;
         if (convertView == null){//primeira vez
             LayoutInflater inflater = LayoutInflater.from(context);
             convertView = inflater.inflate(R.layout.list_item, parent, false);
@@ -70,8 +72,25 @@ public class WeatherArrayAdapter extends ArrayAdapter <Weather>{
             viewHolder.conditionImageView.setImageBitmap(bitmaps.get(day.iconURL));
         }
         else{
-            new LoadImageTask (viewHolder.conditionImageView).execute(day.iconURL);
+            //new LoadImageTask (viewHolder.conditionImageView).execute(day.iconURL);
             //Picasso.with(context).load(day.iconURL).into(viewHolder.conditionImageView);
+            Picasso.with(context).load(day.iconURL).into(new Target() {
+                @Override
+                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                    viewHolder.conditionImageView.setImageBitmap(bitmap);
+                    bitmaps.put(day.iconURL, bitmap);
+                }
+
+                @Override
+                public void onBitmapFailed(Drawable errorDrawable) {
+
+                }
+
+                @Override
+                public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                }
+            });
         }
 
         /*LinearLayout linearLayout = (LinearLayout) inflater.inflate(R.layout.list_item, parent, false);
@@ -88,7 +107,7 @@ public class WeatherArrayAdapter extends ArrayAdapter <Weather>{
         return convertView;
     }
 
-    private class LoadImageTask extends AsyncTask<String, Void, Bitmap> {
+    /*private class LoadImageTask extends AsyncTask<String, Void, Bitmap> {
         private ImageView imageView;
         public LoadImageTask (ImageView imageView){
             this.imageView = imageView;
@@ -117,7 +136,8 @@ public class WeatherArrayAdapter extends ArrayAdapter <Weather>{
             return bitmap;
         }
         protected void onPostExecute(Bitmap bitmap) {
+
             imageView.setImageBitmap(bitmap);
         }
-    }
+    }*/
 }
